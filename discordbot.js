@@ -1,51 +1,82 @@
-const Discord = require("discord.js");
-const client = new Discord.Client();
-require('dotenv').config();
-
-const keepAlive = require('./server');
-const Monitor = require('ping-monitor');
- 
-keepAlive();
-const monitor = new Monitor({
-    website: 'LINK',
-    title: 'Nombre',
-    interval: 30 // minutes
+// Requirements and Variables
+const keepAlive = require(`./server`);
+const { Client, GatewayIntentBits } = require('discord.js');
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.DirectMessageTyping,
+  ],
 });
- 
-monitor.on('up', (res) => console.log(`${res.website} está encedido.`));
-monitor.on('down', (res) => console.log(`${res.website} se ha caído - ${res.statusMessage}`));
-monitor.on('stop', (website) => console.log(`${website} se ha parado.`) );
-monitor.on('error', (error) => console.log(error));
 
 client.on("ready", () => {
-  console.log("El bot esta listo!");
+  console.log(`Bot iniciado como ${client.user.tag}!`);
 });
 
-client.on("message", (message) => {
+//Comandos server
+client.on('messageCreate', (message) => {
   if (message.content.startsWith("!")) {
     var args = message.content.substring(1).split(" ");
     var cmd = args[0];
     args = args.splice(1);
-
-    switch(cmd) {
+    switch (cmd) {
       case "mencionar":
-          var user = message.mentions.users.first();
+        var user = message.mentions.users.first();
+        if (user) {
           message.channel.send(`<@${user.id}> Hola cabezon`);
-          break;
+        } else {
+          message.channel.send(`Como vas a mencionar sin arrobar pelotude`);
+        }
+        break;
       case "saludar":
-          message.channel.send(`Hola manga de giles`);
-          break;
+        message.channel.send(`Hola manga de giles`);
+        break;
       case "despedirse":
-          message.channel.send(`Nos re vimos loko`);
-          break;
+        message.channel.send(`Nos re vimos loko`);
+        break;
       case "gil":
-          message.channel.send(`No podes ser tan gil boludo`);
-          break;
+        message.channel.send(`No podes ser tan gil boludo`);
+        break;
       case "marquitos":
-          message.channel.send(`El hermano perdido de holder`);
-          break;
+        message.channel.send(`El hermano perdido de holder`);
+        break;
+      case "infraganti":
+        message.channel.send(`Te haces el chistoso <@${user.id}> cara de verga`)
+        break;
+      case "ayudame":
+        message.channel.send(`Los comandos disponibles son: mencionar, saludar, despedirse, marquitos, putita, cometraba`);
+        break;
+      default:
+        message.channel.send("Este comando no es válido");
+        break;
     }
   }
 });
 
-client.login("<YOUR_BOT_TOKEN>");
+//Mensaje privado
+client.on('messageCreate', (message) => {
+  if (message.content.startsWith("!")) {
+    var args = message.content.substring(1).split(" ");
+    var cmd = args[0];
+    args = args.splice(1);
+    switch (cmd) {
+      case "putita":
+        message.author.send("como vos gorde");
+        break;
+      case "cometraba":
+        message.author.send("como vos");
+        break;
+      /*default:
+        message.author.send("Este comando no es válido");
+        break;*/
+    }
+  }
+});
+
+
+
+// Bot Login
+client.login("MTA2NTAzMDQ4MTUzNzY3OTM4MA.GtHnp3.xQ-Gb1qO0F2848QW7cKC6sWIRPExWeOV3OjM3s");
+keepAlive();

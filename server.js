@@ -1,13 +1,14 @@
-const express = require('express')
+const express = require('express');
 const server = express();
 
-server.all('/', (req, res) => {
-    res.send('El bot sigue encendido.');
+server.all(`/`, (req, res) => {
+  res.send(`Result: [OK].`);
 });
 
-module.exports = () => {
-    server.listen(3000, () => {
-        console.log('Servidor Listo.');
-    });
-    return true;
+function keepAlive() {
+  server.listen(3000, () => {
+    console.log(`Server is now ready! | ` + Date.now());
+  });
 }
+
+module.exports = keepAlive;
