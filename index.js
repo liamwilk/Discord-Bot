@@ -1,5 +1,5 @@
 // Requirements and Variables
-const keepAlive = require(`./server`);
+const { keepAlive } = require(`./keep_alive`);
 const { Client, IntentsBitField } = require('discord.js');
 const eventHandler = require('./handlers/eventHandler');
 const config = require('./config.json');
