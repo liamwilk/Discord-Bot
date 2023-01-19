@@ -5,27 +5,32 @@ from keepAlive import keep_alive
 #Global vars
 token = os.getenv("bot_token")
 bot_name = "Snipert's Bot"
-cmd_prefix = "|"
+cmd_prefix = "/"
 mod_role = "Mod Role"
 
-client = commands.Bot(command_prefix=cmd_prefix)
+intents = discord.Intents.all() # or .all() if you ticked all, that is easier
+intents.members = True # If you ticked the SERVER MEMBERS INTENT
+ # "Import" the intents
+client = discord.Client(intents=discord.Intents.default())
+client = commands.Bot(command_prefix=cmd_prefix, intents=intents)
 client.remove_command('help')
 
 
 @client.event
 async def on_ready():
+    await client.tree.sync()
     await client.change_presence(activity=discord.Game(
         name=f"{cmd_prefix}help"))
     print("Bot Online")
 
 
-@client.command()
-async def ping(ctx):
-    await ctx.send(f'Pong! {round(client.latency * 1000)}ms')
+@client.tree.command(name="ping", description="Ver el ping")
+async def ping(interaction: discord.Interaction):
+    await interaction.response.send_message(f'Pong! {round(client.latency * 1000)}ms')
 
 
-@client.command()
-async def help(ctx):
+@client.tree.command(name="help", description="Ayuda")
+async def help(interaction: discord.Interaction):
     embed = discord.Embed(title='Help',
                           description="Probá los siguientes comeandos:",
                           colour=discord.Colour.orange())
@@ -55,12 +60,12 @@ async def help(ctx):
                     value="Saluda a un usuario o a vos",
                     inline=False)
     embed.add_field(
-        name=f"{cmd_prefix}survey <Pregunta>, <Opción 1>, <Opción 2>...",
+        name=f"{cmd_prefix}survey '<Pregunta>', <Opción 1>, <Opción 2>...",
         value=
         "Realiza una encuesta, recordar el uso de las **comas** y de las **comillas**",
         inline=False)
 
-    await ctx.send(embed=embed)
+    await interaction.response.send_message(embed=embed)
 
 
 @client.event
@@ -69,17 +74,17 @@ async def on_command_error(ctx, error):
         await ctx.send('Este comando no existe, metele pilas y lee |help')
 
 
-@client.command()
-async def saludar(ctx, member: discord.Member = None):
+@client.tree.command(name="saludar", description="Saludar a un usuario")
+async def saludar(interaction: discord.Interaction, member: discord.Member = None):
     if member is None:
-        member = ctx.author
-    await ctx.send(f'Como andas, {member.mention} gil!')
+        member = interaction.user
+    await interaction.response.send_message(f'Como andas, {member.mention} gil!')
 
 
-@client.command()
+@client.tree.command(name="suggest", description="Sugerir una función")
 @commands.cooldown(1, 60, commands.BucketType.user)
-async def suggest(ctx, *, suggestion):
-    author = ctx.message.author
+async def suggest(interaction: discord.Interaction, *, suggestion: str):
+    author = interaction.user.id
     embed = discord.Embed(title='Sugerencia',
                           description="Fue sugerido por",
                           colour=discord.Colour.orange())
@@ -87,7 +92,7 @@ async def suggest(ctx, *, suggestion):
     embed.set_author(name=bot_name)
     embed.add_field(name=author, value=suggestion, inline=False)
     channel = client.get_channel(sugerencias)
-    await ctx.send("Sugerencia enviada")
+    await interaction.response.send_message("Sugerencia enviada")
     msg = await channel.send(embed=embed)
     await msg.add_reaction('👍')
     await msg.add_reaction('👎')
@@ -120,9 +125,9 @@ async def give_role(ctx,
     member.add_roles(role, reason=reason)
 
 
-@client.command()
+@client.tree.command(name="kick", description="Expulsar a un usuario")
 @commands.has_permissions(kick_members=True)
-async def kick(ctx, member: discord.Member, *, reason=None):
+async def kick(interaction: discord.Interaction, member: discord.Member, *, reason: str):
     embedkick = discord.Embed(title=f"""
     {member.mention} has been kicked from the server:
     
@@ -132,36 +137,35 @@ async def kick(ctx, member: discord.Member, *, reason=None):
                               colour=discord.Colour.dark_red())
     if reason == None:
         reason = " no reason provided"
-    await ctx.send(embed=embedkick)
-    await ctx.guild.kick(member)
+    await interaction.author.send(embed=embedkick)
+    await interaction.guild.kick(member, reason=reason)
 
 
-@client.command()
+@client.tree.command(name="ban", description="Banear a un usuario")
 @commands.has_permissions(ban_members=True)
-async def ban(ctx, member: discord.Member, *, reason=None):
+async def ban(interaction: discord.Interaction, member: discord.Member, *, reason: str):
     embedban = discord.Embed(title=f"""
     {member.mention} has been banned from the server:
-
     **Reason** - {reason}
     """,
                              description="",
                              colour=discord.Colour.dark_red())
     if reason == None:
         reason = " no reason provided"
-    await ctx.send(embed=embedban)
-    await ctx.guild.ban(member)
+    await interaction.author.send(embed=embedban)
+    await interaction.guild.ban(member, reason=reason)
 
 
-@client.command()
+@client.tree.command(name="unban", description="Desbanear a un usuario")
 @commands.has_permissions(ban_members=True)
-async def unban(ctx, user_id: int, *, reason=None):
-    user = await ctx.guild.fetch_ban(user_id)
-    await ctx.guild.unban(user, reason=reason)
-    await ctx.send(f"El usuario con ID {user.id} ha sido desbaneado.")
+async def unban(interaction: discord.Interaction, user_id: int, *, reason: str):
+    user = await interaction.guild.fetch_ban(user_id)
+    await interaction.guild.unban(user, reason=reason)
+    await interaction.author.send(f"El usuario con ID {user.id} ha sido desbaneado.")
 
 
-@client.command()
-async def survey(ctx, question: str, options: str):
+@client.tree.command(name="survey", description="Realizar una encuesta")
+async def survey(interaction: discord.Interaction, question: str, options: str):
     # Separate the options by ','
     options_list = options.split(',')
     # Create an embed object to hold the survey information
@@ -170,7 +174,7 @@ async def survey(ctx, question: str, options: str):
     for i, option in enumerate(options_list):
         survey_embed.add_field(name=f"Opción {i+1}", value=option)
     # Send the embed to the channel
-    survey_msg = await ctx.send(embed=survey_embed)
+    survey_msg = await interaction.response.send_message(embed=survey_embed)
     # Add the reaction buttons for each option
     for i in range(len(options_list)):
         await survey_msg.add_reaction(f"{i+1}\u20e3")
