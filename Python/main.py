@@ -1,6 +1,6 @@
-import discord, os
+import discord, os, re, discord.abc
 from discord.ext import commands
-from keepAlive import keep_alive
+from keep_alive import keep_alive
 
 #Global vars
 token = os.getenv("bot_token")
@@ -125,43 +125,63 @@ async def give_role(ctx,
     member.add_roles(role, reason=reason)
 
 
-@client.tree.command(name="kick", description="Expulsar a un usuario")
+@client.tree.command(name="kick", description="Echar a un usuario")
 @commands.has_permissions(kick_members=True)
-async def kick(interaction: discord.Interaction, member: discord.Member, *, reason: str):
-    embedkick = discord.Embed(title=f"""
-    {member.mention} has been kicked from the server:
-    
-    **Reason** - {reason}
-    """,
-                              description="",
-                              colour=discord.Colour.dark_red())
-    if reason == None:
-        reason = " no reason provided"
-    await interaction.author.send(embed=embedkick)
-    await interaction.guild.kick(member, reason=reason)
+async def Kick(interaction: discord.Interaction, member: str, *, reason: str):
+    match = re.search(r'<@!?([0-9]+)>', member)
+    if match:
+        member_id = int(match.group(1))
+        member = discord.utils.get(interaction.guild.members, id=member_id)
+        if member:
+            embedKick = discord.Embed(title=f"""
+            {member.mention} has been kicked from the server:
+            **Reason** - {reason}
+            """,
+                                     description="",
+                                     colour=discord.Colour.dark_red())
+            if reason == None:
+                reason = " no reason provided"
+            await interaction.response.send_message(embed=embedKick)
+            await interaction.guild.Kick(member, reason=reason)
+        else:
+            await interaction.response.send_message(f"Miembros no encontrado para ID: {member_id}")
+    else:
+        await interaction.response.send_message(f"Mención inválida proporcionada: {member}")
 
 
 @client.tree.command(name="ban", description="Banear a un usuario")
 @commands.has_permissions(ban_members=True)
-async def ban(interaction: discord.Interaction, member: discord.Member, *, reason: str):
-    embedban = discord.Embed(title=f"""
-    {member.mention} has been banned from the server:
-    **Reason** - {reason}
-    """,
-                             description="",
-                             colour=discord.Colour.dark_red())
-    if reason == None:
-        reason = " no reason provided"
-    await interaction.author.send(embed=embedban)
-    await interaction.guild.ban(member, reason=reason)
-
+async def ban(interaction: discord.Interaction, member: str, *, reason: str):
+    match = re.search(r'<@!?([0-9]+)>', member)
+    if match:
+        member_id = int(match.group(1))
+        member = discord.utils.get(interaction.guild.members, id=member_id)
+        if member:
+            embedban = discord.Embed(title=f"""
+            {member.mention} has been banned from the server:
+            **Reason** - {reason}
+            """,
+                                     description="",
+                                     colour=discord.Colour.dark_red())
+            if reason == None:
+                reason = " no reason provided"
+            await interaction.response.send_message(embed=embedban)
+            await interaction.guild.ban(member, reason=reason)
+        else:
+            await interaction.response.send_message(f"Member not found for ID: {member_id}")
+    else:
+        await interaction.response.send_message(f"Invalid mention provided: {member}")
 
 @client.tree.command(name="unban", description="Desbanear a un usuario")
 @commands.has_permissions(ban_members=True)
 async def unban(interaction: discord.Interaction, user_id: int, *, reason: str):
-    user = await interaction.guild.fetch_ban(user_id)
-    await interaction.guild.unban(user, reason=reason)
-    await interaction.author.send(f"El usuario con ID {user.id} ha sido desbaneado.")
+    banned_user = await interaction.guild.fetch_ban(user_id)
+    if banned_user:
+        await interaction.guild.unban(banned_user.user, reason=reason)
+        await interaction.response.send_message(f"{banned_user.user.name} has been unbanned.")
+    else:
+        await interaction.response.send_message("User not found.")
+
 
 
 @client.tree.command(name="survey", description="Realizar una encuesta")
@@ -177,8 +197,8 @@ async def survey(interaction: discord.Interaction, question: str, options: str):
     survey_msg = await interaction.response.send_message(embed=survey_embed)
     # Add the reaction buttons for each option
     for i in range(len(options_list)):
-        await survey_msg.add_reaction(f"{i+1}\u20e3")
+        option_field = survey_embed.fields[i]
+        await interaction.response.add_reaction(option_field.name, emoji=f"{i+1}\u20e3")
 
-
-client.run(token)
 keep_alive()
+client.run(token)
