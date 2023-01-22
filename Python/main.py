@@ -182,8 +182,6 @@ async def unban(interaction: discord.Interaction, user_id: int, *, reason: str):
     else:
         await interaction.response.send_message("User not found.")
 
-
-
 @client.tree.command(name="survey", description="Realizar una encuesta")
 async def survey(interaction: discord.Interaction, question: str, options: str):
     # Separate the options by ','
@@ -197,8 +195,8 @@ async def survey(interaction: discord.Interaction, question: str, options: str):
     survey_msg = await interaction.response.send_message(embed=survey_embed)
     # Add the reaction buttons for each option
     for i in range(len(options_list)):
-        option_field = survey_embed.fields[i]
-        await interaction.response.add_reaction(option_field.name, emoji=f"{i+1}\u20e3")
+        await survey_msg.add_reaction(f"{i+1}\u20e3")
+
 
 keep_alive()
 client.run(token)
