@@ -45,7 +45,7 @@ async def help(interaction: discord.Interaction):
     embed.add_field(
         name=f"{cmd_prefix}suggest <Sugerencia>",
         value=
-        "Sugerí una nueva función para cualquier bot con el rol original o simplemente una función de servidor",
+        "Sugerí una nueva función para cualquier bot con el rol original o simplemente una función de servidor, **requiere de un canal de sugerencias**",
         inline=False)
     embed.add_field(name=f"{cmd_prefix}kick <@user>",
                     value="Comando únicamente para el staff",
