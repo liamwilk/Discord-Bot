@@ -3,7 +3,7 @@ const {
   Interaction,
   ApplicationCommandOptionType,
   PermissionFlagsBits,
-} = require('discord.js');
+} = require("discord.js");
 
 module.exports = {
   /**
@@ -13,9 +13,9 @@ module.exports = {
    */
 
   callback: async (client, interaction) => {
-    const targetUserId = interaction.options.get('target-user').value;
+    const targetUserId = interaction.options.get("target-user").value;
     const reason =
-      interaction.options.get('reason')?.value || 'No reason provided';
+      interaction.options.get("reason")?.value || "No reason provided";
 
     await interaction.deferReply();
 
@@ -62,18 +62,18 @@ module.exports = {
     }
   },
 
-  name: 'kick',
-  description: 'Kicks a member from this server.',
+  name: "kick",
+  description: "Kicks a member from this server.",
   options: [
     {
-      name: 'target-user',
-      description: 'The user you want to kick.',
+      name: "target-user",
+      description: "The user you want to kick.",
       type: ApplicationCommandOptionType.Mentionable,
       required: true,
     },
     {
-      name: 'reason',
-      description: 'The reason you want to kick.',
+      name: "reason",
+      description: "The reason you want to kick.",
       type: ApplicationCommandOptionType.String,
     },
   ],

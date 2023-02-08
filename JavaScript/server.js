@@ -1,6 +1,6 @@
-const express = require('express');
+const express = require("express");
 const server = express();
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder } = require("discord.js");
 
 server.all(`/`, (req, res) => {
   res.send(`Result: [OK].`);

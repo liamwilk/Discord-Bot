@@ -1,9 +1,9 @@
 // Requirements and Variables
 const keepAlive = require(`./server`);
-const { Client, Discord, IntentsBitField } = require('discord.js');
-const eventHandler = require('/home/runner/Bot-Discord/handlers/eventHandler');
-const config = require('/home/runner/Bot-Discord/config.json');
-const mySecret = process.env['TOKEN']
+const { Client, Discord, IntentsBitField } = require("discord.js");
+const eventHandler = require("/home/runner/Bot-Discord/handlers/eventHandler");
+const config = require("/home/runner/Bot-Discord/config.json");
+const mySecret = process.env["TOKEN"];
 
 const client = new Client({
   intents: [
@@ -19,4 +19,3 @@ eventHandler(client);
 // Bot Login
 client.login(mySecret);
 keepAlive();
-

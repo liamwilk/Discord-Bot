@@ -1,6 +1,6 @@
 module.exports = {
-  name: 'ayuda',
-  description: 'Tells all the available commands',
+  name: "ayuda",
+  description: "Tells all the available commands",
 
   callback: async (client, interaction) => {
     await interaction.deferReply();
@@ -14,4 +14,3 @@ module.exports = {
     );
   },
 };
-

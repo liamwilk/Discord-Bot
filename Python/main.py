@@ -1,16 +1,19 @@
-import discord, os, re, discord.abc
+import discord
+import os
+import re
+import discord.abc
 from discord.ext import commands
 from keep_alive import keep_alive
 
-#Global vars
+# Global vars
 token = os.getenv("bot_token")
 bot_name = "Snipert's Bot"
 cmd_prefix = "/"
 mod_role = "Mod Role"
 
-intents = discord.Intents.all() # or .all() if you ticked all, that is easier
-intents.members = True # If you ticked the SERVER MEMBERS INTENT
- # "Import" the intents
+intents = discord.Intents.all()  # or .all() if you ticked all, that is easier
+intents.members = True  # If you ticked the SERVER MEMBERS INTENT
+# "Import" the intents
 client = discord.Client(intents=discord.Intents.default())
 client = commands.Bot(command_prefix=cmd_prefix, intents=intents)
 client.remove_command('help')
@@ -44,8 +47,7 @@ async def help(interaction: discord.Interaction):
                     inline=False)
     embed.add_field(
         name=f"{cmd_prefix}suggest <Sugerencia>",
-        value=
-        "Sugerí una nueva función para cualquier bot con el rol original o simplemente una función de servidor, **requiere de un canal de sugerencias**",
+        value="Sugerí una nueva función para cualquier bot con el rol original o simplemente una función de servidor, **requiere de un canal de sugerencias**",
         inline=False)
     embed.add_field(name=f"{cmd_prefix}kick <@user>",
                     value="Comando únicamente para el staff",
@@ -61,8 +63,7 @@ async def help(interaction: discord.Interaction):
                     inline=False)
     embed.add_field(
         name=f"{cmd_prefix}survey '<Pregunta>', <Opción 1>, <Opción 2>...",
-        value=
-        "Realiza una encuesta, recordar el uso de las **comas** y de las **comillas**",
+        value="Realiza una encuesta, recordar el uso de las **comas** y de las **comillas**",
         inline=False)
 
     await interaction.response.send_message(embed=embed)
@@ -114,7 +115,7 @@ async def clear(ctx, amount: int):
     await ctx.channel.purge(limit=amount)
 
 
-#Manually Give Command
+# Manually Give Command
 @client.command()
 @commands.has_role(mod_role)
 async def give_role(ctx,
@@ -137,8 +138,8 @@ async def Kick(interaction: discord.Interaction, member: str, *, reason: str):
             {member.mention} has been kicked from the server:
             **Reason** - {reason}
             """,
-                                     description="",
-                                     colour=discord.Colour.dark_red())
+                                      description="",
+                                      colour=discord.Colour.dark_red())
             if reason == None:
                 reason = " no reason provided"
             await interaction.response.send_message(embed=embedKick)
@@ -172,6 +173,7 @@ async def ban(interaction: discord.Interaction, member: str, *, reason: str):
     else:
         await interaction.response.send_message(f"Invalid mention provided: {member}")
 
+
 @client.tree.command(name="unban", description="Desbanear a un usuario")
 @commands.has_permissions(ban_members=True)
 async def unban(interaction: discord.Interaction, user_id: int, *, reason: str):
@@ -181,6 +183,7 @@ async def unban(interaction: discord.Interaction, user_id: int, *, reason: str):
         await interaction.response.send_message(f"{banned_user.user.name} has been unbanned.")
     else:
         await interaction.response.send_message("User not found.")
+
 
 @client.tree.command(name="survey", description="Realizar una encuesta")
 async def survey(interaction: discord.Interaction, question: str, options: str):

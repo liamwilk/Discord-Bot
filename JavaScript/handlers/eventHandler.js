@@ -2,14 +2,12 @@ const { glob } = require("glob");
 const { promisify } = require("util");
 const { Client } = require("discord.js");
 
-
 const globPromise = promisify(glob);
 
 /**
  * @param {Client} client
  */
 module.exports = async (client) => {
-
   const slashCommands = await globPromise(
     `${process.cwd()}/SlashCommands/*/*.js`
   );
@@ -25,9 +23,5 @@ module.exports = async (client) => {
   });
   client.on("ready", async () => {
     await client.application.commands.set(arrayOfSlashCommands);
-
-
   });
-
-
 };

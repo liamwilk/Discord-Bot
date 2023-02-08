@@ -1,7 +1,7 @@
-const { testServer } = require('/home/runner/Bot/config.json');
-const areCommandsDifferent = require('/home/runner/Bot/utils/areCommandsDifferent');
-const getApplicationCommands = require('/home/runner/Bot/utils/getApplicationCommands');
-const getLocalCommands = require('/home/runner/Bot/utils/getLocalCommands');
+const { testServer } = require("/home/runner/Bot/config.json");
+const areCommandsDifferent = require("/home/runner/Bot/utils/areCommandsDifferent");
+const getApplicationCommands = require("/home/runner/Bot/utils/getApplicationCommands");
+const getLocalCommands = require("/home/runner/Bot/utils/getLocalCommands");
 
 module.exports = async (client) => {
   try {

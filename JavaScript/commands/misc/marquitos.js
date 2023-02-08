@@ -1,6 +1,6 @@
 module.exports = {
-  name: 'marquitos',
-  description: 'Says something of a specific person',
+  name: "marquitos",
+  description: "Says something of a specific person",
 
   callback: async (client, interaction) => {
     await interaction.deferReply();
@@ -9,8 +9,6 @@ module.exports = {
 
     const ping = reply.createdTimestamp - interaction.createdTimestamp;
 
-    interaction.editReply(
-      `El hermano perdido de Holder`
-    );
+    interaction.editReply(`El hermano perdido de Holder`);
   },
 };

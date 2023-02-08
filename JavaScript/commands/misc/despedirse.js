@@ -1,6 +1,6 @@
 module.exports = {
-  name: 'despedirse',
-  description: 'Says bye to the users',
+  name: "despedirse",
+  description: "Says bye to the users",
 
   callback: async (client, interaction) => {
     await interaction.deferReply();
@@ -9,8 +9,6 @@ module.exports = {
 
     const ping = reply.createdTimestamp - interaction.createdTimestamp;
 
-    interaction.editReply(
-      `Nos re vimo loko`
-    );
+    interaction.editReply(`Nos re vimo loko`);
   },
 };
