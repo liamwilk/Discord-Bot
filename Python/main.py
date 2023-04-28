@@ -22,32 +22,31 @@ client.remove_command('help')
 @client.event
 async def on_ready():
     await client.tree.sync()
-    await client.change_presence(activity=discord.Game(
-        name=f"{cmd_prefix}help"))
+    await client.change_presence(activity=discord.Game(name=f"{cmd_prefix}help"))
     print("Bot Online")
 
 
 @client.tree.command(name="ping", description="Ver el ping")
 async def ping(interaction: discord.Interaction):
-    await interaction.response.send_message(f'Pong! {round(client.latency * 1000)}ms')
+    await interaction.response.send_message(
+        f'Pong! {round(client.latency * 1000)}ms')
 
 
 @client.tree.command(name="help", description="Ayuda")
 async def help(interaction: discord.Interaction):
     embed = discord.Embed(title='Help',
-                          description="Probá los siguientes comeandos:",
+                          description="Probá los siguientes comandos:",
                           colour=discord.Colour.orange())
 
     embed.set_author(name=bot_name)
     embed.add_field(name=f"{cmd_prefix}ping",
-                    value="Ver el ping",
-                    inline=False)
+                    value="Ver el ping", inline=False)
     embed.add_field(name=f"{cmd_prefix}clear <Número de mensajes a borrar>",
                     value="Borrar mensajes, poner cantidad hasta 100",
                     inline=False)
     embed.add_field(
         name=f"{cmd_prefix}suggest <Sugerencia>",
-        value="Sugerí una nueva función para cualquier bot con el rol original o simplemente una función de servidor, **requiere de un canal de sugerencias**",
+        value="Sugerí una nueva función para cualquier bot con el rol original o simplemente una función de servidor",
         inline=False)
     embed.add_field(name=f"{cmd_prefix}kick <@user>",
                     value="Comando únicamente para el staff",
@@ -72,11 +71,12 @@ async def help(interaction: discord.Interaction):
 @client.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
-        await ctx.send('Este comando no existe, metele pilas y lee |help')
+        await ctx.send('Este comando no existe, metele pilas y lee /help')
 
 
 @client.tree.command(name="saludar", description="Saludar a un usuario")
-async def saludar(interaction: discord.Interaction, member: discord.Member = None):
+async def saludar(interaction: discord.Interaction,
+                  member: discord.Member = None):
     if member is None:
         member = interaction.user
     await interaction.response.send_message(f'Como andas, {member.mention} gil!')
@@ -128,7 +128,7 @@ async def give_role(ctx,
 
 @client.tree.command(name="kick", description="Echar a un usuario")
 @commands.has_permissions(kick_members=True)
-async def Kick(interaction: discord.Interaction, member: str, *, reason: str):
+async def kick(interaction: discord.Interaction, member: str, *, reason: str):
     match = re.search(r'<@!?([0-9]+)>', member)
     if match:
         member_id = int(match.group(1))
@@ -143,11 +143,13 @@ async def Kick(interaction: discord.Interaction, member: str, *, reason: str):
             if reason == None:
                 reason = " no reason provided"
             await interaction.response.send_message(embed=embedKick)
-            await interaction.guild.Kick(member, reason=reason)
+            await interaction.guild.kick(member, reason=reason)
         else:
-            await interaction.response.send_message(f"Miembros no encontrado para ID: {member_id}")
+            await interaction.response.send_message(
+                f"Member not found for ID: {member_id}")
     else:
-        await interaction.response.send_message(f"Mención inválida proporcionada: {member}")
+        await interaction.response.send_message(
+            f"Invalid mention provided: {member}")
 
 
 @client.tree.command(name="ban", description="Banear a un usuario")
@@ -169,24 +171,29 @@ async def ban(interaction: discord.Interaction, member: str, *, reason: str):
             await interaction.response.send_message(embed=embedban)
             await interaction.guild.ban(member, reason=reason)
         else:
-            await interaction.response.send_message(f"Member not found for ID: {member_id}")
+            await interaction.response.send_message(
+                f"Member not found for ID: {member_id}")
     else:
-        await interaction.response.send_message(f"Invalid mention provided: {member}")
+        await interaction.response.send_message(
+            f"Invalid mention provided: {member}")
 
 
 @client.tree.command(name="unban", description="Desbanear a un usuario")
 @commands.has_permissions(ban_members=True)
-async def unban(interaction: discord.Interaction, user_id: int, *, reason: str):
+async def unban(interaction: discord.Interaction, user_id: int, *,
+                reason: str):
     banned_user = await interaction.guild.fetch_ban(user_id)
     if banned_user:
         await interaction.guild.unban(banned_user.user, reason=reason)
-        await interaction.response.send_message(f"{banned_user.user.name} has been unbanned.")
+        await interaction.response.send_message(
+            f"{banned_user.user.name} has been unbanned.")
     else:
         await interaction.response.send_message("User not found.")
 
 
 @client.tree.command(name="survey", description="Realizar una encuesta")
-async def survey(interaction: discord.Interaction, question: str, options: str):
+async def survey(interaction: discord.Interaction, question: str,
+                 options: str):
     # Separate the options by ','
     options_list = options.split(',')
     # Create an embed object to hold the survey information
