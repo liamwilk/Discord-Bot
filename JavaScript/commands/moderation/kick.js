@@ -1,82 +1,31 @@
-const {
-  Client,
-  Interaction,
-  ApplicationCommandOptionType,
-  PermissionFlagsBits,
-} = require("discord.js");
-
 module.exports = {
-  /**
-   *
-   * @param {Client} client
-   * @param {Interaction} interaction
-   */
-
-  callback: async (client, interaction) => {
-    const targetUserId = interaction.options.get("target-user").value;
-    const reason =
-      interaction.options.get("reason")?.value || "No reason provided";
-
-    await interaction.deferReply();
-
-    const targetUser = await interaction.guild.members.fetch(targetUserId);
-
-    if (!targetUser) {
-      await interaction.editReply("That user doesn't exist in this server.");
-      return;
+  name: 'kick',
+  description: 'Kicks a member from the server',
+  execute(message, args) {
+    // Check if the user has the necessary permissions
+    if (!message.member.hasPermission('KICK_MEMBERS')) {
+      return message.reply('You do not have permission to kick members');
     }
 
-    if (targetUser.id === interaction.guild.ownerId) {
-      await interaction.editReply(
-        "You can't kick that user because they're the server owner."
-      );
-      return;
+    // Check if the bot has the necessary permissions
+    if (!message.guild.me.hasPermission('KICK_MEMBERS')) {
+      return message.reply('I do not have permission to kick members');
     }
 
-    const targetUserRolePosition = targetUser.roles.highest.position; // Highest role of the target user
-    const requestUserRolePosition = interaction.member.roles.highest.position; // Highest role of the user running the cmd
-    const botRolePosition = interaction.guild.members.me.roles.highest.position; // Highest role of the bot
+    // Get the member to kick
+    const member = message.mentions.members.first() || message.guild.members.cache.get(args[0]);
 
-    if (targetUserRolePosition >= requestUserRolePosition) {
-      await interaction.editReply(
-        "You can't kick that user because they have the same/higher role than you."
-      );
-      return;
+    // Check if a member was mentioned
+    if (!member) {
+      return message.reply('Please mention a valid member of this server');
     }
 
-    if (targetUserRolePosition >= botRolePosition) {
-      await interaction.editReply(
-        "I can't kick that user because they have the same/higher role than me."
-      );
-      return;
-    }
-
-    // Kick the targetUser
-    try {
-      await targetUser.kick(reason);
-      await interaction.editReply(
-        `User ${targetUser} was kicked\nReason: ${reason}`
-      );
-    } catch (error) {
-      console.log(`There was an error when kicking: ${error}`);
-    }
+    // Kick the member
+    member.kick().then(() => {
+      message.reply(`${member.user.tag} has been kicked from the server`);
+    }).catch(err => {
+      message.reply('I was unable to kick the member');
+      console.error(err);
+    });
   },
-
-  name: "kick",
-  description: "Kicks a member from this server.",
-  options: [
-    {
-      name: "target-user",
-      description: "The user you want to kick.",
-      type: ApplicationCommandOptionType.Mentionable,
-      required: true,
-    },
-    {
-      name: "reason",
-      description: "The reason you want to kick.",
-      type: ApplicationCommandOptionType.String,
-    },
-  ],
-  permissionsRequired: [PermissionFlagsBits.KickMembers],
-  botPermissions: [PermissionFlagsBits.KickMembers],
 };

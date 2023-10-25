@@ -1,6 +1,6 @@
 module.exports = {
-  name: "gil",
-  description: "Le habla de manera amable",
+  name: "goodbye",
+  description: "Says bye to the user that invoked the command",
 
   callback: async (client, interaction) => {
     await interaction.deferReply();
@@ -9,6 +9,6 @@ module.exports = {
 
     const ping = reply.createdTimestamp - interaction.createdTimestamp;
 
-    interaction.editReply(`No podes ser tan gil boludo`);
+    interaction.editReply(`Goodbye, ${interaction.user}! 👋`);
   },
 };

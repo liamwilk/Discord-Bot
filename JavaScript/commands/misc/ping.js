@@ -10,7 +10,7 @@ module.exports = {
     const ping = reply.createdTimestamp - interaction.createdTimestamp;
 
     interaction.editReply(
-      `Pong! Client ${ping}ms | Websocket: ${client.ws.ping}ms`
+      `🏓 Pong! \nBot latency: ${ping}ms \nAPI Latency: ${client.ws.ping}ms`
     );
   },
 };
